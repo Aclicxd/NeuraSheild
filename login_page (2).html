@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NeuraShield — Secure Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #080c10;
+    --surface: #0d1117;
+    --surface2: #131920;
+    --border: #1e2a35;
+    --border2: #243040;
+    --accent: #00d4ff;
+    --accent2: #0099cc;
+    --danger: #ff4444;
+    --warning: #ffaa00;
+    --safe: #00cc88;
+    --text: #e8f0f8;
+    --muted: #5a7a8a;
+    --muted2: #3a5060;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    cursor: none;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 400px;
+    background: radial-gradient(ellipse, rgba(0,212,255,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .login-container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 420px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+
+  .welcome-text {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .welcome-text p {
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.6;
+    margin-top: 12px;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .form-control {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
+    transition: all 0.2s;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
+  }
+
+  .form-control::placeholder { color: var(--muted2); }
+
+  .remember-forgot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .remember {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .remember input { accent-color: var(--accent); }
+
+  .remember label {
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .forgot-password {
+    color: var(--accent);
+    font-size: 14px;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+
+  .forgot-password:hover { opacity: 0.8; }
+
+  .btn-login {
+    width: 100%;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    padding: 14px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: none;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-login:hover {
+    background: #fff;
+    box-shadow: 0 0 20px rgba(0,212,255,0.4);
+    transform: translateY(-2px);
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    margin: 24px 0;
+    color: var(--muted2);
+  }
+
+  .divider::before,
+  .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border2);
+  }
+
+  .divider span {
+    padding: 0 12px;
+    font-size: 13px;
+  }
+
+  .social-login {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .social-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: none;
+    transition: all 0.2s;
+  }
+
+  .social-btn:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  .signup-link {
+    text-align: center;
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .signup-link a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+    transition: opacity 0.2s;
+  }
+
+  .signup-link a:hover { opacity: 0.8; }
+
+  .error-message {
+    background: rgba(255, 68, 68, 0.12);
+    border: 1px solid rgba(255, 68, 68, 0.25);
+    color: var(--danger);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 14px;
+    margin-bottom: 20px;
+    display: none;
+  }
+
+  .error-message.show { display: block; }
+
+  /* CUSTOM CURSOR */
+  .target-cursor-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    z-index: 9999;
+    mix-blend-mode: difference;
+    transform: translate(-50%, -50%);
+  }
+
+  .target-cursor-dot {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 4px;
+    height: 4px;
+    background: #fff;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .target-cursor-corner {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 12px;
+    height: 12px;
+    border: 3px solid #fff;
+  }
+
+  .corner-tl { transform: translate(-150%, -150%); border-right: none; border-bottom: none; }
+  .corner-tr { transform: translate(50%, -150%); border-left: none; border-bottom: none; }
+  .corner-br { transform: translate(50%, 50%); border-left: none; border-top: none; }
+  .corner-bl { transform: translate(-150%, 50%); border-right: none; border-top: none; }
+
+  /* STAR BORDER EFFECT */
+  .star-border-container {
+    display: inline-block;
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .border-gradient-bottom {
+    position: absolute;
+    width: 300%;
+    height: 50%;
+    opacity: 0.7;
+    bottom: -12px;
+    right: -250%;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, var(--accent) 0%, transparent 70%);
+    animation: star-movement-bottom 4s linear infinite alternate;
+    z-index: 0;
+  }
+
+  .border-gradient-top {
+    position: absolute;
+    opacity: 0.7;
+    width: 300%;
+    height: 50%;
+    top: -12px;
+    left: -250%;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, var(--accent) 0%, transparent 70%);
+    animation: star-movement-top 4s linear infinite alternate;
+    z-index: 0;
+  }
+
+  .inner-content {
+    position: relative;
+    border: 1px solid #222;
+    background: #000;
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+    padding: 10px 26px;
+    border-radius: 20px;
+    z-index: 1;
+  }
+
+  @keyframes star-movement-bottom {
+    0% { transform: translate(0%, 0%); opacity: 1; }
+    100% { transform: translate(-100%, 0%); opacity: 0; }
+  }
+
+  @keyframes star-movement-top {
+    0% { transform: translate(0%, 0%); opacity: 1; }
+    100% { transform: translate(100%, 0%); opacity: 0; }
+  }
+
+  /* FOCUS CONTAINER FOR LOGO */
+  .focus-container {
+    position: relative;
+    display: flex;
+    gap: 1em;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    outline: none;
+    user-select: none;
+    margin-bottom: 30px;
+  }
+
+  .focus-word {
+    position: relative;
+    font-size: 28px;
+    font-weight: 800;
+    cursor: none;
+    outline: none;
+    user-select: none;
+    letter-spacing: -0.5px;
+    color: var(--text);
+  }
+
+  .focus-word span { color: var(--accent); }
+
+  .focus-frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    box-sizing: content-box;
+  }
+
+  .corner-frame {
+    position: absolute;
+    width: 1rem;
+    height: 1rem;
+    border: 3px solid #fff;
+    filter: drop-shadow(0px 0px 4px #fff);
+    border-radius: 3px;
+    transition: border-color 0.2s, filter 0.2s;
+  }
+
+  .top-left { top: -10px; left: -10px; border-right: none; border-bottom: none; }
+  .top-right { top: -10px; right: -10px; border-left: none; border-bottom: none; }
+  .bottom-left { bottom: -10px; left: -10px; border-right: none; border-top: none; }
+  .bottom-right { bottom: -10px; right: -10px; border-left: none; border-top: none; }
+
+  .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(0,0,0,0.3);
+    border-top-color: #000;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    display: inline-block;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 480px) {
+    .login-container { padding: 30px 20px; }
+  }
+</style>
+</head>
+<body>
+  <div class="target-cursor-wrapper" id="cursor">
+    <div class="target-cursor-dot"></div>
+    <div class="target-cursor-corner corner-tl"></div>
+    <div class="target-cursor-corner corner-tr"></div>
+    <div class="target-cursor-corner corner-br"></div>
+    <div class="target-cursor-corner corner-bl"></div>
+  </div>
+
+  <div class="login-container">
+    <div class="focus-container" id="logoContainer">
+      <div class="focus-word" id="focusWord">Neura<span>Shield</span></div>
+      <div class="focus-frame" id="focusFrame">
+        <div class="corner-frame top-left"></div>
+        <div class="corner-frame top-right"></div>
+        <div class="corner-frame bottom-left"></div>
+        <div class="corner-frame bottom-right"></div>
+      </div>
+    </div>
+
+    <div class="welcome-text">
+      <div class="star-border-container">
+        <div class="border-gradient-top"></div>
+        <div class="border-gradient-bottom"></div>
+        <div class="inner-content">Welcome Back</div>
+      </div>
+      <p>Sign in to access your PII detection dashboard</p>
+    </div>
+
+    <div class="error-message" id="errorMessage">
+      Invalid credentials. Please try again.
+    </div>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" class="form-control" placeholder="your.email@example.com" required>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+      </div>
+
+      <div class="remember-forgot">
+        <div class="remember">
+          <input type="checkbox" id="remember">
+          <label for="remember">Remember me</label>
+        </div>
+        <a href="#" class="forgot-password">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="btn-login" id="loginBtn">
+        <span>🔒</span> Sign In to NeuraShield
+      </button>
+    </form>
+
+    <div class="divider"><span>OR CONTINUE WITH</span></div>
+
+    <div class="social-login">
+      <button class="social-btn"><span>🌐</span> Google</button>
+      <button class="social-btn"><span>🐙</span> GitHub</button>
+    </div>
+
+    <div class="signup-link">
+      Don't have an account? <a href="#">Sign up now</a>
+    </div>
+  </div>
+
+  <script>
+    const cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+    });
+
+    const focusWord = document.getElementById('focusWord');
+    const corners = document.querySelectorAll('.corner-frame');
+
+    focusWord.addEventListener('mouseenter', () => {
+      corners.forEach(c => {
+        c.style.borderColor = 'var(--accent)';
+        c.style.filter = 'drop-shadow(0px 0px 8px var(--accent))';
+      });
+    });
+
+    focusWord.addEventListener('mouseleave', () => {
+      corners.forEach(c => {
+        c.style.borderColor = '#fff';
+        c.style.filter = 'drop-shadow(0px 0px 4px #fff)';
+      });
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      if (email && password) {
+        const btn = document.getElementById('loginBtn');
+        btn.innerHTML = '<span class="spinner"></span> Authenticating...';
+        btn.disabled = true;
+
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 1500);
+      } else {
+        document.getElementById('errorMessage').classList.add('show');
+      }
+    });
+  </script>
+</body>
+</html>
